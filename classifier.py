@@ -25,8 +25,8 @@ The change item is an isolation of an activity that is causing a modification to
 
 For example:
 
-if change description: The manufacturer proposes to change the tablet coating from HPMC-based to a PVA-based film coat using Opadry II. The drug product is an 
-immediate release oral tablet. No change to core formulation. then change item: change in tablet coating 
+if change description: I want to change my primary packaging from HDPE to glass and also extend the shelf life from 24 to 36 months 
+then change items: 1. change in primary packaging material 2. change in approved shelf life
 
 Change description:{change_description}
 
