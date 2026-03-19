@@ -9,6 +9,7 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 
 def load_knowledge_base():
     df = pd.read_excel('canada2.ods', engine='odf', header=1)
+    df['change_item'] = df['change_item'].str.strip()
     return df
 
 def collect_user_context():
@@ -41,6 +42,15 @@ Which of the above descriptions best matches the user's change item?
 Output only the exact matching description(s) from the list, one per line. Nothing else.
 """
     response = model.generate_content(prompt)
+    
+    # Debug: see what came back
+    print("Finish reason:", response.candidates[0].finish_reason)
+    print("Parts:", response.candidates[0].content.parts)
+    
+    if not response.candidates or not response.candidates[0].content.parts:
+        print("Warning: no valid response from LLM")
+        return ""
+    
     return response.text.strip()
 
 def get_candidate_rows(change_items, market, material_type):
@@ -55,9 +65,9 @@ def get_candidate_rows(change_items, market, material_type):
         print(f"Matched to: {matched_text}")
         
         # Find rows where change_item matches the LLM output
-        matched_rows = filtered[
-            filtered['change_item'].isin(matched_text.split("\n"))
-        ]
+        matched_items = [line.strip() for line in matched_text.split("\n") if line.strip()]
+        matched_rows = filtered[filtered['change_item'].isin(matched_items)]
+        
         all_candidates.append({
             "change_item": item,
             "matched_rows": matched_rows
