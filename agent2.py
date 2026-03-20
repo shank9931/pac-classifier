@@ -8,8 +8,9 @@ genai.configure(api_key=os.getenv("api_key"))
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 def load_knowledge_base():
-    df = pd.read_excel('canada2.ods', engine='odf', header=1)
+    df = pd.read_excel('canada2.ods', engine='odf', header=1, na_filter=False)
     df['change_item'] = df['change_item'].str.strip()
+    df['dosage_form'] = df['dosage_form'].str.strip()
     return df
 
 def collect_user_context():
@@ -42,11 +43,7 @@ Which of the above descriptions best matches the user's change item?
 Output only the exact matching description(s) from the list, one per line. Nothing else.
 """
     response = model.generate_content(prompt)
-    
-    # Debug: see what came back
-    print("Finish reason:", response.candidates[0].finish_reason)
-    print("Parts:", response.candidates[0].content.parts)
-    
+        
     if not response.candidates or not response.candidates[0].content.parts:
         print("Warning: no valid response from LLM")
         return ""
